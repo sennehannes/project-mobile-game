@@ -1,0 +1,110 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Inventory
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Tab 1</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-list lines="full">
+    <ion-item *ngFor="let slot of slots">
+      <ion-label> {{slot}} </ion-label>
+      <ion-label> {{playerService.getEquipedItemInSlot(slot)}}</ion-label>
+      <ion-button *ngIf="!playerService.slotIsEquiped(slot)" (click)="playerService.equipItem(slot)">Equip</ion-button>
+      <ion-button *ngIf="playerService.slotIsEquiped(slot)" (click)="playerService.unequipeItem(slot)">Unequip</ion-button>
+    </ion-item>
+  </ion-list>
+
+  <ion-item>
+    <ion-label>ItemInventory</ion-label>
+    <ion-list>
+      <ion-item>
+        <ion-select (ionChange)="handleFilterSelection($event)" interface="popover" placeholder="Select Inventory Filter">
+          <ion-select-option (value)="None">None</ion-select-option>
+          <ion-select-option (value)="Quality">Quality</ion-select-option>
+          <ion-select-option (value)="Slot">Slot</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </ion-list>
+  </ion-item>
+
+  <ion-reorder-group *ngIf="getFilter() === 'None'" disabled="false" (ionItemReorder)="doReorder($event)">
+    <ion-item *ngFor="let playerItems of playerService.getAllPlayerBackpacktems()">
+      <ion-label (click)="playerService.selectItem(playerItems.id)" [color]="playerService.isSelected(playerItems) ? 'success' : '' "> {{playerItems.name}}</ion-label>
+      <ion-card slot="start" *ngIf="playerService.isSelected(playerItems)">
+        <ion-card-subtitle [color]="playerService.returnRarityColor(playerItems.rarity)">{{playerItems.rarity}}</ion-card-subtitle>
+        <ion-label>{{playerItems.propertys.slot}}</ion-label>
+        <ion-label>item abilitys: 
+          <span *ngFor="let itemAbility of playerService.showItemAbilitys(playerItems.id)" (click)="playerService.showItemAbilityDescription(true,itemAbility)">{{itemAbility.name}}, </span>
+        </ion-label>
+        <ion-label>attack:{{playerItems.propertys.attackModifyer}} - defense:{{playerItems.propertys.defenseModifyer}}</ion-label>
+      </ion-card>
+      <ion-reorder slot="end"></ion-reorder>
+    </ion-item>
+  </ion-reorder-group>
+
+  <ion-accordion-group *ngIf="getFilter() === 'Quality'" [multiple]="true">
+      <ion-accordion *ngFor="let rarity of raritys">
+        <ion-item slot="header" color="light">
+          <ion-label>{{rarity}}</ion-label>
+          <ion-badge slot="end">{{playerService.getAllItemsOfRarity(rarity).length}}</ion-badge>
+        </ion-item>
+        <ion-item *ngFor="let playerItems of playerService.getAllItemsOfRarity(rarity)" slot="content">
+          <ion-label (click)="playerService.selectItem(playerItems.id)" [color]="playerService.isSelected(playerItems) ? 'success' : '' "> {{playerItems.name}} </ion-label>
+          <ion-card slot="start" *ngIf="playerService.isSelected(playerItems)">
+            <ion-label>{{playerItems.propertys.slot}}</ion-label>
+            <ion-label>item abilitys: 
+              <span *ngFor="let itemAbility of playerService.showItemAbilitys(playerItems.id)" (click)="playerService.showItemAbilityDescription(true,itemAbility)">{{itemAbility.name}}, </span>
+            </ion-label>
+            <ion-label>attack:{{playerItems.propertys.attackModifyer}} - defense:{{playerItems.propertys.defenseModifyer}}</ion-label>
+          </ion-card>
+        </ion-item>
+      </ion-accordion>
+  </ion-accordion-group>
+
+  <ion-accordion-group *ngIf="getFilter() === 'Slot'" [multiple]="true">
+    <ion-accordion *ngFor="let slot of slots">
+      <ion-item slot="header" color="light">
+        <ion-label>{{slot}}</ion-label>
+        <ion-badge slot="end">{{playerService.getAllItemsOfSlot(slot).length}}</ion-badge>
+      </ion-item>
+      <ion-item *ngFor="let playerItems of playerService.getAllItemsOfSlot(slot)" slot="content">
+        <ion-label (click)="playerService.selectItem(playerItems.id)" [color]="playerService.isSelected(playerItems) ? 'success' : '' "> {{playerItems.name}} </ion-label>
+        <ion-card slot="start" *ngIf="playerService.isSelected(playerItems)">
+          <ion-card-subtitle [color]="playerService.returnRarityColor(playerItems.rarity)">{{playerItems.rarity}}</ion-card-subtitle>
+          <ion-label>item abilitys: 
+            <span *ngFor="let itemAbility of playerService.showItemAbilitys(playerItems.id)" (click)="playerService.showItemAbilityDescription(true,itemAbility)">{{itemAbility.name}}, </span>
+          </ion-label>
+          <ion-label>attack:{{playerItems.propertys.attackModifyer}} - defense:{{playerItems.propertys.defenseModifyer}}</ion-label>
+        </ion-card>
+      </ion-item>
+    </ion-accordion>
+  </ion-accordion-group>
+
+  <ion-modal [isOpen]="playerService.openAbilityDescription">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{playerService.showSelectedItemName()}}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="playerService.showItemAbilityDescription(false)">Close</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <p>
+          {{playerService.showSelectedItemDescription()}}
+        </p>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+
+</ion-content>

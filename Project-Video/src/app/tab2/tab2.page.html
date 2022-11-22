@@ -1,0 +1,36 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title> Batlle </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Tab 2</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div>
+    <p>
+      {{activeEnemy.name}}:
+      {{activeEnemy.maxHealth}}/{{activeEnemy.currentHealth}}
+    </p>
+    <ion-progress-bar
+      [value]="activeEnemy.getEnemyHealthPercentage()"
+      color="danger"
+    ></ion-progress-bar>
+  </div>
+
+  <div>
+    <p>
+      {{playerService.getPlayerName()}}:
+      {{playerService.getPlayerMaxHealth()}}/{{playerService.getPlayerCurrentHealth()}}
+    </p>
+    <ion-progress-bar
+      [value]="playerService.getPlayerHealthPercentage()"
+      color="success"
+    ></ion-progress-bar>
+    <ion-button (click)="attack()">damage</ion-button>
+  </div>
+</ion-content>
